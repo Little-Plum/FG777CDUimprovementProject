@@ -138,8 +138,6 @@ var key = func(v) {
 				}
 				if (cduDisplay == "POS_INIT"){
 					setprop("/instrumentation/fmc/ref-airport",cduInput);
-					setprop("/instrumentation/fmc/ref-airport-pos",cduInput);
-					setprop("/instrumentation/fmc/gate",cduInput);
 					cduInput = "";
 				}
 				if (cduDisplay == "NAV_RAD"){
@@ -174,6 +172,13 @@ var key = func(v) {
 				}
 				else if (cduDisplay == "EICAS_SYN"){
 					eicasDisplay = "DRS";
+				}else if (cduDisplay == "POS_INIT"){
+					if(getprop("/instrumentation/fmc/ref-airport") != ""){
+						setprop("/instrumentation/fmc/ref-airport-pos", " ");
+						setprop("/instrumentation/fmc/ref-airport-poslat", " ");
+						setprop("/instrumentation/fmc/ref-airport-poslon", " ");
+						cduInput = "WORK IN PROGRESS";
+					}
 				}
 				else if (cduDisplay == "NAV_RAD"){
 					if (int(cduInput) < 360) {
@@ -195,6 +200,10 @@ var key = func(v) {
 			if (v == "LSK3L"){
 				if (cduDisplay == "INIT_REF"){
 					cduDisplay = "PERF_INIT";
+				}
+				if (cduDisplay == "POS_INIT"){
+					setprop("/instrumentation/fmc/gate",cduInput);
+					cduInput = "";
 				}
 				if (cduDisplay == "NAV_RAD"){
 					if (int(cduInput) > 189 and int(cduInput) < 1751) {
