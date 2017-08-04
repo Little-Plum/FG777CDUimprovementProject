@@ -553,7 +553,11 @@ var cdu = func{
 					return aptA_INIT;
 				}
 			}
-			line2l = getRefApt();
+			line2l = call(func getRefApt(), nil, var err = []);
+			if (size(err)){
+				setprop("/instrumentation/fmc/ref-airport", "");
+				setprop("/instrumentation/cdu/input", "NOT IN DATABASE");
+			} 
 			line2r = getprop("/instrumentation/fmc/ref-airport-pos");
 			line3lt = "GATE";
 			line3l = getprop("/instrumentation/fmc/gate");
