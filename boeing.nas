@@ -1,3 +1,51 @@
+var latdeg2latDMM = func(inLatDeg){
+	var latdegree_INIT = int(inLatDeg);
+	var latminint_INIT = int((inLatDeg - latdegree_INIT) * 60);
+	var latmindouble_INIT = int((((inLatDeg - latdegree_INIT) * 60) - latminint_INIT) * 10);
+	if(latminint_INIT < 10){
+		var outlatminint_INIT = "0"~abs(latminint_INIT);
+	}else{
+		var outlatminint_INIT = abs(latminint_INIT);
+	}
+	var latmin_INIT = outlatminint_INIT~"."~abs(latmindouble_INIT);
+	var isNS_INIT = "N";
+	if(inLatDeg	> 0){
+			isNS_INIT = "N";
+	}else{
+			isNS_INIT = "S";
+	}
+	if(latdegree_INIT < 10){
+		var outlatdegree_INIT = "0"~abs(latdegree_INIT);
+	}else{
+		var outlatdegree_INIT = abs(latdegree_INIT);
+	}
+	var latresults_INIT = isNS_INIT~outlatdegree_INIT~"*"~latmin_INIT;
+	return latresults_INIT;
+}
+var londeg2lonDMM = func(inLonDeg){
+	var londegree_INIT = int(inLonDeg);
+	var lonminint_INIT = int((inLonDeg - londegree_INIT) * 60);
+	var lonmindouble_INIT = int((((inLonDeg - londegree_INIT) * 60) - lonminint_INIT) * 10);
+	if(lonminint_INIT < 10){
+		var outlonminint_INIT = "0"~abs(lonminint_INIT);
+	}else{
+		var outlonminint_INIT = abs(lonminint_INIT);
+	}
+	var lonmin_INIT = outlonminint_INIT~"."~abs(lonmindouble_INIT);
+	var isEW_INIT = "E";
+	if(inLonDeg > 0){
+		isEW_INIT = "E";
+	}else{
+		isEW_INIT = "W";
+	}
+	if(londegree_INIT < 10){
+		var outlondegree_INIT = "0"~abs(londegree_INIT);
+	}else{
+		var outlondegree_INIT = abs(londegree_INIT);
+	}
+	var lonresults_INIT = isEW_INIT~outlondegree_INIT~"*"~lonmin_INIT;
+	return lonresults_INIT;
+}
 var input = func(v) {
 		setprop("/instrumentation/cdu/input",getprop("/instrumentation/cdu/input")~v);
 	}
@@ -56,6 +104,12 @@ var key = func(v) {
 				}
 				if (cduDisplay == "EICAS_SYN"){
 					eicasDisplay = "HYD";
+				}
+				if (cduDisplay == "POS_INIT"){
+					setprop("/instrumentation/fmc/lastpos", " ");
+					setprop("/instrumentation/fmc/lastposlat", " ");
+					setprop("/instrumentation/fmc/lastposlon", " ");
+					cduInput = "WORK IN PROGRESS";
 				}
 				if (cduDisplay == "NAV_RAD"){
 					if (int(cduInput) > 107 and int(cduInput) < 119) {
@@ -188,6 +242,12 @@ var key = func(v) {
 				}
 			}
 			if (v == "LSK4R"){
+				if (cduDisplay == "POS_INIT"){
+					setprop("/instrumentation/fmc/gpspos", " ");
+					setprop("/instrumentation/fmc/gpsposlat", " ");
+					setprop("/instrumentation/fmc/gpsposlon", " ");
+					cduInput = "WORK IN PROGRESS";
+				}
 				if (cduDisplay == "RTE1_LEGS"){
 					setprop("/autopilot/route-manager/route/wp[4]/altitude-ft",cduInput);
 					if (substr(cduInput,0,2) == "FL"){
@@ -458,56 +518,18 @@ var cdu = func{
 			}
 		}
 		if (display == "POS_INIT") {
-			var latdeg2latDMM = func(inLatDeg){
-				var latdegree_INIT = int(inLatDeg);
-				var latminint_INIT = int((inLatDeg - latdegree_INIT) * 60);
-				var latmindouble_INIT = int((((inLatDeg - latdegree_INIT) * 60) - latminint_INIT) * 10);
-				if(latminint_INIT < 10){
-					var outlatminint_INIT = "0"~abs(latminint_INIT);
-				}else{
-					var outlatminint_INIT = abs(latminint_INIT);
-				}
-				var latmin_INIT = outlatminint_INIT~"."~abs(latmindouble_INIT);
-				var isNS_INIT = "N";
-				if(inLatDeg			 > 0){
-						isNS_INIT = "N";
-				}else{
-						isNS_INIT = "S";
-				}
-				if(latdegree_INIT < 10){
-					var outlatdegree_INIT = "0"~abs(latdegree_INIT);
-				}else{
-					var outlatdegree_INIT = abs(latdegree_INIT);
-				}
-				var latresults_INIT = isNS_INIT~outlatdegree_INIT~"*"~latmin_INIT;
-				return latresults_INIT;
-				
+			title = "POS INIT";
+			line1rt = "LAST POS";
+			var getLastPos = func(){
+			    setprop("/instrumentation/fmc/lastposlat", getprop("/position/latitude-deg"));
+				setprop("/instrumentation/fmc/lastposlon", getprop("/position/longitude-deg"));
+				var lastPosGot = latdeg2latDMM(getprop("/position/latitude-deg"))~" "~londeg2lonDMM(getprop("/position/longitude-deg"));
+				setprop("/instrumentation/fmc/lastpos", lastPosGot);
+				return lastPosGot;
 			}
-			var londeg2lonDMM = func(inLonDeg){
-				var londegree_INIT = int(inLonDeg);
-				var lonminint_INIT = int((inLonDeg - londegree_INIT) * 60);
-				var lonmindouble_INIT = int((((inLonDeg - londegree_INIT) * 60) - lonminint_INIT) * 10);
-				if(lonminint_INIT < 10){
-					var outlonminint_INIT = "0"~abs(lonminint_INIT);
-				}else{
-					var outlonminint_INIT = abs(lonminint_INIT);
-				}
-				var lonmin_INIT = outlonminint_INIT~"."~abs(lonmindouble_INIT);
-				var isEW_INIT = "E";
-				if(inLonDeg > 0){
-						isEW_INIT = "E";
-					}else{
-						isEW_INIT = "W";
-				}
-				if(londegree_INIT < 10){
-					var outlondegree_INIT = "0"~abs(londegree_INIT);
-				}else{
-					var outlondegree_INIT = abs(londegree_INIT);
-				}
-				var lonresults_INIT = isEW_INIT~outlondegree_INIT~"*"~lonmin_INIT;
-				return lonresults_INIT;
-			}
-			var refApt = func(){
+			line1r = getLastPos();
+			line2lt = "REF AIRPORT";
+			var getRefApt = func(){
 				var aptA_INIT = getprop("/instrumentation/fmc/ref-airport") or "";
 				if (aptA_INIT == ""){
 				    setprop("/instrumentation/fmc/gate", " ");
@@ -522,16 +544,17 @@ var cdu = func{
 					return aptA_INIT;
 				}
 			}
-			title = "POS INIT";
-			line1rt = "LAST POS";
-			line1r = latdeg2latDMM(getprop("/position/latitude-deg"))~" "~londeg2lonDMM(getprop("/position/longitude-deg"));
-			line2lt = "REF AIRPORT";
-			line2l = refApt();
+			line2l = getRefApt();
 			line2r = getprop("/instrumentation/fmc/ref-airport-pos");
 			line3lt = "GATE";
 			line3l = getprop("/instrumentation/fmc/gate");
 			line4rt = "GPS POS";
-			line4r = latdeg2latDMM(getprop("/position/latitude-deg"))~" "~londeg2lonDMM(getprop("/position/longitude-deg"));
+			var getGpsPos = func(){
+				var gpsPosGot = latdeg2latDMM(getprop("/position/latitude-deg"))~" "~londeg2lonDMM(getprop("/position/longitude-deg"));
+				setprop("/instrumentation/fmc/gpspos", gpsPosGot);
+				return gpsPosGot;
+			}
+			line4r = getGpsPos();
 			line4lt = "UTC";
 			if(getprop("/instrumentation/clock/indicated-hour") < 10){
 				if(getprop("/instrumentation/clock/indicated-min") < 10){
