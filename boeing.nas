@@ -84,6 +84,8 @@ var key = func(v) {
 				}
 				if (cduDisplay == "POS_INIT"){
 					setprop("/instrumentation/fmc/ref-airport",cduInput);
+					setprop("/instrumentation/fmc/ref-airport-pos",cduInput);
+					setprop("/instrumentation/fmc/gate",cduInput);
 					cduInput = "";
 				}
 				if (cduDisplay == "NAV_RAD"){
@@ -456,10 +458,10 @@ var cdu = func{
 			}
 		}
 		if (display == "POS_INIT") {
-			var latdeg2latDMM = func(){
-				var latdegree_INIT = int(getprop("/position/latitude-deg"));
-				var latminint_INIT = int((getprop("/position/latitude-deg") - latdegree_INIT) * 60);
-				var latmindouble_INIT = int((((getprop("/position/latitude-deg") - latdegree_INIT) * 60) - latminint_INIT) * 10);
+			var latdeg2latDMM = func(inLatDeg){
+				var latdegree_INIT = int(inLatDeg);
+				var latminint_INIT = int((inLatDeg - latdegree_INIT) * 60);
+				var latmindouble_INIT = int((((inLatDeg - latdegree_INIT) * 60) - latminint_INIT) * 10);
 				if(latminint_INIT < 10){
 					var outlatminint_INIT = "0"~abs(latminint_INIT);
 				}else{
@@ -467,7 +469,7 @@ var cdu = func{
 				}
 				var latmin_INIT = outlatminint_INIT~"."~abs(latmindouble_INIT);
 				var isNS_INIT = "N";
-				if(getprop("/position/latitude-deg") > 0){
+				if(inLatDeg			 > 0){
 						isNS_INIT = "N";
 				}else{
 						isNS_INIT = "S";
@@ -481,10 +483,10 @@ var cdu = func{
 				return latresults_INIT;
 				
 			}
-			var londeg2lonDMM = func(){
-				var londegree_INIT = int(getprop("/position/longitude-deg"));
-				var lonminint_INIT = int((getprop("/position/longitude-deg") - londegree_INIT) * 60);
-				var lonmindouble_INIT = int((((getprop("/position/longitude-deg") - londegree_INIT) * 60) - lonminint_INIT) * 10);
+			var londeg2lonDMM = func(inLonDeg){
+				var londegree_INIT = int(inLonDeg);
+				var lonminint_INIT = int((inLonDeg - londegree_INIT) * 60);
+				var lonmindouble_INIT = int((((inLonDeg - londegree_INIT) * 60) - lonminint_INIT) * 10);
 				if(lonminint_INIT < 10){
 					var outlonminint_INIT = "0"~abs(lonminint_INIT);
 				}else{
@@ -492,7 +494,7 @@ var cdu = func{
 				}
 				var lonmin_INIT = outlonminint_INIT~"."~abs(lonmindouble_INIT);
 				var isEW_INIT = "E";
-				if(getprop("/position/longitude-deg") > 0){
+				if(inLonDeg > 0){
 						isEW_INIT = "E";
 					}else{
 						isEW_INIT = "W";
@@ -505,25 +507,31 @@ var cdu = func{
 				var lonresults_INIT = isEW_INIT~outlondegree_INIT~"*"~lonmin_INIT;
 				return lonresults_INIT;
 			}
-			var RefApt = func(){
-			var a = getprop("/instrumentation/fmc/ref-airport") or "";
-			if (a == ""){
-				var b = "----";
-				return b;
-			}else{
-				return a;
+			var refApt = func(){
+				var aptA_INIT = getprop("/instrumentation/fmc/ref-airport") or "";
+				if (aptA_INIT == ""){
+				    setprop("/instrumentation/fmc/gate", " ");
+					setprop("/instrumentation/fmc/ref-airport-pos", " ");
+					return "----";
+				}else{
+					var refAptLat = airportinfo(aptA_INIT).lat;
+					var refAptLon = airportinfo(aptA_INIT).lon;
+					var refAptPosStr = latdeg2latDMM(refAptLat)~" "~londeg2lonDMM(refAptLon);
+					setprop("/instrumentation/fmc/gate", "-----");
+					setprop("/instrumentation/fmc/ref-airport-pos", refAptPosStr);
+					return aptA_INIT;
 				}
 			}
 			title = "POS INIT";
 			line1rt = "LAST POS";
-			line1r = latdeg2latDMM()~" "~londeg2lonDMM();
+			line1r = latdeg2latDMM(getprop("/position/latitude-deg"))~" "~londeg2lonDMM(getprop("/position/longitude-deg"));
 			line2lt = "REF AIRPORT";
-			line2l = RefApt();
-			#line2l = "----";
+			line2l = refApt();
+			line2r = getprop("/instrumentation/fmc/ref-airport-pos");
 			line3lt = "GATE";
-			line3l = "-----";
+			line3l = getprop("/instrumentation/fmc/gate");
 			line4rt = "GPS POS";
-			line4r = latdeg2latDMM()~" "~londeg2lonDMM();
+			line4r = latdeg2latDMM(getprop("/position/latitude-deg"))~" "~londeg2lonDMM(getprop("/position/longitude-deg"));
 			line4lt = "UTC";
 			if(getprop("/instrumentation/clock/indicated-hour") < 10){
 				if(getprop("/instrumentation/clock/indicated-min") < 10){
