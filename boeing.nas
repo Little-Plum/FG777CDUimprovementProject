@@ -542,7 +542,7 @@ var cdu = func{
 				var aptA_INIT = getprop("/instrumentation/fmc/ref-airport") or "";
 				if (aptA_INIT == ""){
 				    setprop("/instrumentation/fmc/gate", " ");
-					setprop("/instrumentation/fmc/ref-airport-pos", " ");
+					setprop("/instrumentation/fmc/ref-airport-pos", "");
 					return "----";
 				}else{
 					var refAptLat = airportinfo(aptA_INIT).lat;
@@ -550,14 +550,17 @@ var cdu = func{
 					var refAptPosStr = latdeg2latDMM(refAptLat)~" "~londeg2lonDMM(refAptLon);
 					setprop("/instrumentation/fmc/gate", "-----");
 					setprop("/instrumentation/fmc/ref-airport-pos", refAptPosStr);
+					#print("aptA_INIT"~aptA_INIT);
 					return aptA_INIT;
 				}
 			}
-			line2l = call(func getRefApt(), nil, var err = []);
+			var line2ltmp = call(func getRefApt(), nil, var err = []);
 			if (size(err)){
 				setprop("/instrumentation/fmc/ref-airport", "");
 				setprop("/instrumentation/cdu/input", "NOT IN DATABASE");
-			} 
+			}else{
+				line2l = line2ltmp;
+			}
 			line2r = getprop("/instrumentation/fmc/ref-airport-pos");
 			line3lt = "GATE";
 			line3l = getprop("/instrumentation/fmc/gate");
