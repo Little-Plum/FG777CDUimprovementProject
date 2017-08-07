@@ -1228,17 +1228,6 @@
 			<property>/instrumentation/cdu/display</property>
 			<value>POS_INIT</value>
         </binding>		
-		<binding>
-			<condition>
-				<equals>
-					<property>/instrumentation/cdu/display</property>
-					<value>POS_INIT</value>
-				</equals>
-			</condition>
-			<command>property-assign</command>
-			<property>/instrumentation/cdu/display</property>
-			<value>POS_REF</value>
-        </binding>
 	</action>
 </animation>
 
