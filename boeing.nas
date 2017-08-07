@@ -1,3 +1,8 @@
+var getGpsPos = func(){
+	var gpsPosGot = latdeg2latDMM(getprop("/position/latitude-deg"))~" "~londeg2lonDMM(getprop("/position/longitude-deg"));
+	setprop("/instrumentation/fmc/gpspos", gpsPosGot);
+	return gpsPosGot;
+	}
 var latdeg2latDMM = func(inLatDeg){
 	var latdegree_INIT = int(inLatDeg);
 	var latminint_INIT = int((inLatDeg - latdegree_INIT) * 60);
@@ -528,6 +533,7 @@ var cdu = func{
 		}
 		if (display == "POS_INIT") {
 			title = "POS INIT";
+			page = "1/3";
 			line1rt = "LAST POS";
 			var getLastPos = func(){
 			    setprop("/instrumentation/fmc/lastposlat", getprop("/position/latitude-deg"));
@@ -565,11 +571,6 @@ var cdu = func{
 			line3lt = "GATE";
 			line3l = getprop("/instrumentation/fmc/gate");
 			line4rt = "GPS POS";
-			var getGpsPos = func(){
-				var gpsPosGot = latdeg2latDMM(getprop("/position/latitude-deg"))~" "~londeg2lonDMM(getprop("/position/longitude-deg"));
-				setprop("/instrumentation/fmc/gpspos", gpsPosGot);
-				return gpsPosGot;
-			}
 			line4r = getGpsPos();
 			line4lt = "UTC";
 			if(getprop("/instrumentation/clock/indicated-hour") < 10){
@@ -588,12 +589,31 @@ var cdu = func{
 			line6l = "<INDEX";
 			line6r = "ROUTE>";
 		}
+		if (display == "POS_REF_0") {
+		title = "POS REF";
+		page = "2/3";
+		line1lt = "FMC(GPS)";
+		line1l = getGpsPos();
+		line2lt = "IRS(3)";
+		line2l = getGpsPos();
+		line6ct = "----------------------------------------";
+		line6l = "<INDEX";
+		}
 		if (display == "POS_REF") {
 			title = "POS REF";
-			line1lt = "FMC POST";
-			line1l = getprop("/position/latitude-string")~" "~getprop("/position/longitude-string");
-			line1rt = "GS";
+			page = "3/3";
+			line1lt = "IRS L";
+			line1rt = "GS";	
+			line1l = getGpsPos();
 			line1r = sprintf("%3.0f", getprop("/velocities/groundspeed-kt"));
+			line2lt = "IRS C";
+			line2rt = "GS";	
+			line2l = getGpsPos();
+			line2r = sprintf("%3.0f", getprop("/velocities/groundspeed-kt"));
+			line3lt = "IRS R";
+			line3rt = "GS";	
+			line3l = getGpsPos();
+			line3r = sprintf("%3.0f", getprop("/velocities/groundspeed-kt"));
 			line5l = "<PURGE";
 			line5r = "INHIBIT>";
 			line6l = "<INDEX";

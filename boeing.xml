@@ -1202,7 +1202,44 @@
             <property>/instrumentation/cdu/display</property>
             <value>RTE1_1</value>
         </binding>
+		<binding>
+			<condition>
+				<equals>
+					<property>/instrumentation/cdu/display</property>
+					<value>POS_REF</value>
+				</equals>
+			</condition>
+			<command>property-assign</command>
+			<property>/instrumentation/cdu/display</property>
+			<value>POS_REF_0</value>
+        </binding>
     </action>
+	<action>
+        <button>0</button>
+        <repeatable>false</repeatable>
+		<binding>
+			<condition>
+				<equals>
+					<property>/instrumentation/cdu/display</property>
+					<value>POS_REF_0</value>
+				</equals>
+			</condition>
+			<command>property-assign</command>
+			<property>/instrumentation/cdu/display</property>
+			<value>POS_INIT</value>
+        </binding>		
+		<binding>
+			<condition>
+				<equals>
+					<property>/instrumentation/cdu/display</property>
+					<value>POS_INIT</value>
+				</equals>
+			</condition>
+			<command>property-assign</command>
+			<property>/instrumentation/cdu/display</property>
+			<value>POS_REF</value>
+        </binding>
+	</action>
 </animation>
 
 <animation>
@@ -1222,7 +1259,33 @@
             <property>/instrumentation/cdu/display</property>
             <value>RTE1_2</value>
         </binding>
+        <binding>
+			<condition>
+				<equals>
+					<property>/instrumentation/cdu/display</property>
+					<value>POS_INIT</value>
+				</equals>
+			</condition>
+			<command>property-assign</command>
+			<property>/instrumentation/cdu/display</property>
+			<value>POS_REF_0</value>
+        </binding>
     </action>
+	<action>
+		<button>0</button>
+		<repeatable>false</repeatable>
+		<binding>
+			<condition>
+				<equals>
+					<property>/instrumentation/cdu/display</property>
+					<value>POS_REF_0</value>
+				</equals>
+			</condition>
+			<command>property-assign</command>
+			<property>/instrumentation/cdu/display</property>
+			<value>POS_REF</value>
+        </binding>
+	</action>
 </animation>
 
 <animation>
