@@ -1,7 +1,64 @@
+var LatDMMunsignal = func(LatDeg){
+	var latdegree_INIT = int(LatDeg);
+	var latminint_INIT = int((LatDeg - latdegree_INIT) * 60);
+	var latmindouble_INIT = int((((LatDeg - latdegree_INIT) * 60) - latminint_INIT) * 10);
+	if(latminint_INIT < 10){
+		var outlatminint_INIT = "0"~abs(latminint_INIT);
+	}else{
+		var outlatminint_INIT = abs(latminint_INIT);
+	}
+	var latmin_INIT = outlatminint_INIT~"."~abs(latmindouble_INIT);
+	var isNS_INIT = "N";
+	if(LatDeg	> 0){
+			isNS_INIT = "N";
+	}else{
+			isNS_INIT = "S";
+	}
+	if(latdegree_INIT < 10){
+		var outlatdegree_INIT = "0"~abs(latdegree_INIT);
+	}else{
+		var outlatdegree_INIT = abs(latdegree_INIT);
+	}
+	var latresults_INIT = isNS_INIT~outlatdegree_INIT~""~latmin_INIT;
+	return latresults_INIT;
+	}
+	
+var LonDmmUnsignal = func(LonDeg){
+	var londegree_INIT = int(LonDeg);
+	var lonminint_INIT = int((LonDeg - londegree_INIT) * 60);
+	var lonmindouble_INIT = int((((LonDeg - londegree_INIT) * 60) - lonminint_INIT) * 10);
+	if(lonminint_INIT < 10){
+		var outlonminint_INIT = "0"~abs(lonminint_INIT);
+	}else{
+	var outlonminint_INIT = abs(lonminint_INIT);
+	}
+	var lonmin_INIT = outlonminint_INIT~"."~abs(lonmindouble_INIT);
+	var isEW_INIT = "E";
+	if(LonDeg > 0){
+		isEW_INIT = "E";
+	}else{
+		isEW_INIT = "W";
+	}
+	if(londegree_INIT < 10){
+		var outlondegree_INIT = "0"~abs(londegree_INIT);
+	}else{
+		var outlondegree_INIT = abs(londegree_INIT);
+	}
+	var lonresults_INIT = isEW_INIT~outlondegree_INIT~lonmin_INIT;
+	return lonresults_INIT;
+	}
+
 var getGpsPos = func(){
 	var gpsPosGot = latdeg2latDMM(getprop("/position/latitude-deg"))~" "~londeg2lonDMM(getprop("/position/longitude-deg"));
 	setprop("/instrumentation/fmc/gpspos", gpsPosGot);
 	return gpsPosGot;
+	}
+var getLastPos = func(){
+	setprop("/instrumentation/fmc/lastposlat", getprop("/position/latitude-deg"));
+	setprop("/instrumentation/fmc/lastposlon", getprop("/position/longitude-deg"));
+	var lastPosGot = latdeg2latDMM(getprop("/position/latitude-deg"))~" "~londeg2lonDMM(getprop("/position/longitude-deg"));
+	setprop("/instrumentation/fmc/lastpos", lastPosGot);
+	return lastPosGot;
 	}
 var latdeg2latDMM = func(inLatDeg){
 	var latdegree_INIT = int(inLatDeg);
@@ -102,6 +159,12 @@ var key = func(v) {
 					setprop("/instrumentation/fmc/to-flap",cduInput);
 					cduInput = "";
 				}
+				if (cduDisplay == "POS_REF_0"){
+					cduInput = LatDMMunsignal(getprop("/position/latitude-deg"))~LonDmmUnsignal(getprop("/position/longitude-deg"));
+				}
+				if (cduDisplay == "POS_REF"){
+					cduInput = LatDMMunsignal(getprop("/position/latitude-deg"))~LonDmmUnsignal(getprop("/position/longitude-deg"));
+				}
 			}
 			if (v == "LSK1R"){
 				if (cduDisplay == "EICAS_MODES"){
@@ -111,10 +174,9 @@ var key = func(v) {
 					eicasDisplay = "HYD";
 				}
 				if (cduDisplay == "POS_INIT"){
-					setprop("/instrumentation/fmc/lastpos", " ");
-					setprop("/instrumentation/fmc/lastposlat", " ");
-					setprop("/instrumentation/fmc/lastposlon", " ");
-					cduInput = "WORK IN PROGRESS";
+					#setprop("/instrumentation/fmc/lastposlat", " ");
+					#setprop("/instrumentation/fmc/lastposlon", " ");
+					cduInput = LatDMMunsignal(getprop("/position/latitude-deg"))~LonDmmUnsignal(getprop("/position/longitude-deg"));
 				}
 				if (cduDisplay == "NAV_RAD"){
 					if (int(cduInput) > 107 and int(cduInput) < 119) {
@@ -143,6 +205,9 @@ var key = func(v) {
 				}
 				if (cduDisplay == "POS_INIT"){
 					setprop("/instrumentation/fmc/ref-airport",cduInput);
+					var RefApt = airportinfo(getprop("/instrumentation/fmc/ref-airport"));
+					setprop("/instrumentation/fmc/ref-airport-poslat",RefApt.lat);
+					setprop("/instrumentation/fmc/ref-airport-poslon",RefApt.lon);
 					cduInput = "";
 				}
 				if (cduDisplay == "NAV_RAD"){
@@ -167,6 +232,12 @@ var key = func(v) {
 						setprop("/autopilot/route-manager/input","@INSERT3:"~cduInput);
 					}
 				}
+				if (cduDisplay == "POS_REF_0"){
+					cduInput = LatDMMunsignal(getprop("/position/latitude-deg"))~LonDmmUnsignal(getprop("/position/longitude-deg"));
+				}
+				if (cduDisplay == "POS_REF"){
+					cduInput = LatDMMunsignal(getprop("/position/latitude-deg"))~LonDmmUnsignal(getprop("/position/longitude-deg"));
+				}
 			}
 			if (v == "LSK2R"){
 				if (cduDisplay == "DEP_ARR_INDEX"){
@@ -179,10 +250,7 @@ var key = func(v) {
 					eicasDisplay = "DRS";
 				}else if (cduDisplay == "POS_INIT"){
 					if(getprop("/instrumentation/fmc/ref-airport") != ""){
-						setprop("/instrumentation/fmc/ref-airport-pos", " ");
-						setprop("/instrumentation/fmc/ref-airport-poslat", " ");
-						setprop("/instrumentation/fmc/ref-airport-poslon", " ");
-						cduInput = "WORK IN PROGRESS";
+						cduInput = LatDMMunsignal(getprop("/instrumentation/fmc/ref-airport-poslat"))~LonDmmUnsignal(getprop("/instrumentation/fmc/ref-airport-poslon"));
 					}
 				}
 				else if (cduDisplay == "NAV_RAD"){
@@ -225,6 +293,12 @@ var key = func(v) {
 						setprop("/autopilot/route-manager/input","@INSERT4:"~cduInput);
 					}
 				}
+				if (cduDisplay == "POS_REF_0"){
+					cduInput = LatDMMunsignal(getprop("/position/latitude-deg"))~LonDmmUnsignal(getprop("/position/longitude-deg"));
+				}
+				if (cduDisplay == "POS_REF"){
+					cduInput = LatDMMunsignal(getprop("/position/latitude-deg"))~LonDmmUnsignal(getprop("/position/longitude-deg"));
+				}
 			}
 			if (v == "LSK3R"){
 				if (cduDisplay == "NAV_RAD"){
@@ -260,7 +334,7 @@ var key = func(v) {
 					setprop("/instrumentation/fmc/gpspos", " ");
 					setprop("/instrumentation/fmc/gpsposlat", " ");
 					setprop("/instrumentation/fmc/gpsposlon", " ");
-					cduInput = "WORK IN PROGRESS";
+					cduInput = LatDMMunsignal(getprop("/position/latitude-deg"))~LonDmmUnsignal(getprop("/position/longitude-deg"));
 				}
 				if (cduDisplay == "RTE1_LEGS"){
 					setprop("/autopilot/route-manager/route/wp[4]/altitude-ft",cduInput);
@@ -462,6 +536,7 @@ var cdu = func{
 			if (getprop("/instrumentation/cdu/ident/engines") != nil){
 				line1r = getprop("/instrumentation/cdu/ident/engines");
 			}
+			line6ct = "----------------------------------";
 			line6l = "<INDEX";
 			line6r = "POS INIT>";
 		}
@@ -535,13 +610,6 @@ var cdu = func{
 			title = "POS INIT";
 			page = "1/3";
 			line1rt = "LAST POS";
-			var getLastPos = func(){
-			    setprop("/instrumentation/fmc/lastposlat", getprop("/position/latitude-deg"));
-				setprop("/instrumentation/fmc/lastposlon", getprop("/position/longitude-deg"));
-				var lastPosGot = latdeg2latDMM(getprop("/position/latitude-deg"))~" "~londeg2lonDMM(getprop("/position/longitude-deg"));
-				setprop("/instrumentation/fmc/lastpos", lastPosGot);
-				return lastPosGot;
-			}
 			line1r = getLastPos();
 			line2lt = "REF AIRPORT";
 			var getRefApt = func(){
@@ -556,7 +624,6 @@ var cdu = func{
 					var refAptPosStr = latdeg2latDMM(refAptLat)~" "~londeg2lonDMM(refAptLon);
 					setprop("/instrumentation/fmc/gate", "-----");
 					setprop("/instrumentation/fmc/ref-airport-pos", refAptPosStr);
-					#print("aptA_INIT"~aptA_INIT);
 					return aptA_INIT;
 				}
 			}
@@ -592,10 +659,12 @@ var cdu = func{
 		if (display == "POS_REF_0") {
 		title = "POS REF";
 		page = "2/3";
-		line1lt = "FMC(GPS)";
+		line1lt = "FMC(GPS)        ACTUAL";
 		line1l = getGpsPos();
-		line2lt = "IRS(3)";
+		line2lt = "IRS(3)        ACTUAL";
 		line2l = getGpsPos();
+		line3lt = "GPS        ACTUAL";
+		line3l = getGpsPos();
 		line6ct = "----------------------------------------";
 		line6l = "<INDEX";
 		}
