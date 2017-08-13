@@ -220,8 +220,13 @@ var key = func(v) {
 					cduDisplay = "POS_INIT";
 				}
 				if (cduDisplay == "RTE1_1"){
+					if (getprop("/autopilot/route-manager/departure/airport") == ""){
+						cduInput = cduInput;
+					}
+					else{
 					setprop("/autopilot/route-manager/departure/runway",cduInput);
 					cduInput = "";
+					}
 				}
 				if (cduDisplay == "RTE1_LEGS"){
 					if (cduInput == "DELETE"){
@@ -268,6 +273,10 @@ var key = func(v) {
 						setprop("/autopilot/route-manager/route/wp[2]/altitude-ft",substr(cduInput,2)*100);
 					}
 					cduInput = "";
+				}
+				if (cduDisplay = RTE1_1){
+				setprop("/instrumentation/fmc/FLT_NO",cduInput);
+				cduInput = "";
 				}
 			}
 			if (v == "LSK3L"){
@@ -707,12 +716,7 @@ var cdu = func{
 			line3rt = "CO ROUTE";
 			line5l = "<RTE COPY";
 			line6l = "<RTE 2";
-			if (getprop("/autopilot/route-manager/active") == 1){
-				line6r = "PERF INIT>";
-				}
-			else {
-				line6r = "ACTIVATE>";
-				}
+			line6r = "ACTIVATE>";
 		}
 		if (display == "RTE1_2") {
 			title = "RTE 1";
