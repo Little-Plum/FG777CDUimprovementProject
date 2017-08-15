@@ -9,7 +9,7 @@ var LatDMMunsignal = func(LatDeg){
 	}
 	var latmin_INIT = outlatminint_INIT~"."~abs(latmindouble_INIT);
 	var isNS_INIT = "N";
-	if(LatDeg	> 0){
+	if(LatDeg > 0){
 			isNS_INIT = "N";
 	}else{
 			isNS_INIT = "S";
@@ -19,8 +19,8 @@ var LatDMMunsignal = func(LatDeg){
 	}else{
 		var outlatdegree_INIT = abs(latdegree_INIT);
 	}
-	var latresults_INIT = isNS_INIT~outlatdegree_INIT~""~latmin_INIT;
-	return latresults_INIT;
+		var latresults_INIT = isNS_INIT~outlatdegree_INIT~""~latmin_INIT;
+		return latresults_INIT;
 	}
 	
 var LonDmmUnsignal = func(LonDeg){
@@ -176,7 +176,7 @@ var key = func(v) {
 				if (cduDisplay == "POS_INIT"){
 					#setprop("/instrumentation/fmc/lastposlat", " ");
 					#setprop("/instrumentation/fmc/lastposlon", " ");
-					cduInput = LatDMMunsignal(getprop("/position/latitude-deg"))~LonDmmUnsignal(getprop("/position/longitude-deg"));
+					cduInput = LatDMMunsignal(getprop("/instrumentation/fmc/lastposlat"))~LonDmmUnsignal(getprop("/instrumentation/fmc/lastposlon"));
 				}
 				if (cduDisplay == "NAV_RAD"){
 					if (int(cduInput) > 107 and int(cduInput) < 119) {
@@ -274,9 +274,9 @@ var key = func(v) {
 					}
 					cduInput = "";
 				}
-				if (cduDisplay = RTE1_1){
-				setprop("/instrumentation/fmc/FLT_NO",cduInput);
-				cduInput = "";
+				else if (cduDisplay = "RTE1_1"){
+					setprop("/instrumentation/fmc/FLT_NO",cduInput);
+					cduInput = "";
 				}
 			}
 			if (v == "LSK3L"){
@@ -373,6 +373,10 @@ var key = func(v) {
 					if (substr(cduInput,0,2) == "FL"){
 						setprop("/autopilot/route-manager/route/wp[5]/altitude-ft",substr(cduInput,2)*100);
 					}
+					cduInput = "";
+				}
+				if (cduDisplay == "POS_INIT"){
+					setprop("/instrumentation/fmc/inertialpos", "WORK IN PROGRESS");
 					cduInput = "";
 				}
 			}
@@ -666,16 +670,16 @@ var cdu = func{
 			line6r = "ROUTE>";
 		}
 		if (display == "POS_REF_0") {
-		title = "POS REF";
-		page = "2/3";
-		line1lt = "FMC(GPS)        ACTUAL";
-		line1l = getGpsPos();
-		line2lt = "IRS(3)        ACTUAL";
-		line2l = getGpsPos();
-		line3lt = "GPS        ACTUAL";
-		line3l = getGpsPos();
-		line6ct = "----------------------------------------";
-		line6l = "<INDEX";
+			title = "POS REF";
+			page = "2/3";
+			line1lt = "FMC(GPS)        ACTUAL";
+			line1l = getGpsPos();
+			line2lt = "IRS(3)        ACTUAL";
+			line2l = getGpsPos();
+			line3lt = "GPS        ACTUAL";
+			line3l = getGpsPos();
+			line6ct = "----------------------------------------";
+			line6l = "<INDEX";
 		}
 		if (display == "POS_REF") {
 			title = "POS REF";
