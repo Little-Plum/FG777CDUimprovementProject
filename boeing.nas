@@ -1,3 +1,43 @@
+var inputPosLatConversion = func(inputedPos){
+	var isNorth = 1;
+	
+	if(find("N", inputedPos) != -1){
+		isNorth = 1;
+	}else{
+		isNorth = 0;
+	}
+	
+	var outputLat = string.trim(string.trim(string.trim(string.trim(inputedPos, 1, string.isdigit), 1, string.ispunct), 1, string.isdigit), 1, string.isalpha);
+	var outputLatMin = string.trim(right(outputLat, 4));
+	var outputLatMinInDeg = outputLatMin/60;
+	var outputLatDeg = (substr(outputLat, 1, size(outputLat) - 5)) + outputLatMinInDeg;
+	if(isNorth != 1){
+		outputLatDeg = outputLatDeg * -1;
+	}
+	#print(outputLat);
+	#print(outputLatDeg);
+	return(outputLatDeg);
+}
+var inputPosLonConversion = func(inputedPos){
+	var isEast = 1;
+	
+	if(find("E", inputedPos) != -1){
+		isEast = 1;
+	}else{
+		isEast = 0;
+	}
+	
+	var outputLon = string.trim(string.trim(string.trim(string.trim(inputedPos, -1, string.isalpha), -1, string.isdigit), -1, string.ispunct), -1, string.isdigit);
+	var outputLonMin = string.trim(right(outputLon, 4));
+	var outputLonMinInDeg = outputLonMin/60;
+	var outputLonDeg = (substr(outputLon, 1, size(outputLon) - 5)) + outputLonMinInDeg;
+	if(isEast != 1){
+		outputLonDeg = outputLonDeg * -1;
+	}
+	#print(outputLon);
+	#print(outputLonDeg);
+	return(outputLonDeg);
+}
 var LatDMMunsignal = func(LatDeg){
 	var latdegree_INIT = int(LatDeg);
 	var latminint_INIT = int((LatDeg - latdegree_INIT) * 60);
@@ -45,9 +85,13 @@ var LonDmmUnsignal = func(LonDeg){
 		var outlondegree_INIT = abs(londegree_INIT);
 	}
 	var lonresults_INIT = isEW_INIT~outlondegree_INIT~lonmin_INIT;
-	return lonresults_INIT;
+		return lonresults_INIT;
 	}
-
+var getIRSPos = func(cduInputedPos){
+	setprop("/instrumentation/fmc/inertialposlat", inputPosLatConversion(cduInputedPos));
+	setprop("/instrumentation/fmc/inertialposlon", inputPosLonConversion(cduInputedPos));
+	setprop("/instrumentation/fmc/inertialpos", latdeg2latDMM(getprop("/instrumentation/fmc/inertialposlat"))~" "~londeg2lonDMM(getprop("/instrumentation/fmc/inertialposlon")));
+	}
 var getGpsPos = func(){
 	var gpsPosGot = latdeg2latDMM(getprop("/position/latitude-deg"))~" "~londeg2lonDMM(getprop("/position/longitude-deg"));
 	setprop("/instrumentation/fmc/gpspos", gpsPosGot);
@@ -376,8 +420,12 @@ var key = func(v) {
 					cduInput = "";
 				}
 				if (cduDisplay == "POS_INIT"){
-					setprop("/instrumentation/fmc/inertialpos", "WORK IN PROGRESS");
+				call(func getIRSPos(cduInput), var err = []);
+				if (size(err)){
+					setprop("/instrumentation/cdu/input", "INVALID");
+				}else{
 					cduInput = "";
+					}
 				}
 			}
 			if (v == "LSK6L"){
