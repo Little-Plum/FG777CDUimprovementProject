@@ -1,3 +1,19 @@
+var echoStars = func(page){
+    var apt = airportinfo(getprop("/autopilot/route-manager/departure/airport"));
+    var allStars = apt.stars();
+    var starsNum = size(apt.stars());
+    var pageNo = 1;
+    if(page == true){
+        if(pageNo < starsNum){
+            pageNo = pageNo + 1;
+        }
+    }
+    else{
+        if(1 > pageNo){
+            pageNo = pageNo + 1;
+        }
+    }
+}
 var echoSids = func(page){
 	var apt = airportinfo(getprop("/autopilot/route-manager/departure/airport"));
 	var allSids = apt.sids();
