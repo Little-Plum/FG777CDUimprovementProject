@@ -1,16 +1,25 @@
-var echoStars = func(page){
+#??????https://git-scm.com/book/zh/v1/Git-%E5%88%86%E6%94%AF-%E5%88%86%E6%94%AF%E7%9A%84%E6%96%B0%E5%BB%BA%E4%B8%8E%E5%90%88%E5%B9%B6
+var TakeMod = func(Num1,Num2){
+    var About = Num1/Num2;
+    var Number = int(About);
+    var Final = Num1-Number
+    return Number;
+}
+var echoStars = func(page,Nums){
     var apt = airportinfo(getprop("/autopilot/route-manager/departure/airport"));
     var allStars = apt.stars();
     var starsNum = size(apt.stars());
-    var pageNo = 1;
+    var pageNo = 0;
     if(page == true){
         if(pageNo < starsNum){
             pageNo = pageNo + 1;
+            setprop(("/instrumentation/cdu/output/line"~apt.stars[TakeMod(starsNum,pageNo)]~/"left",apt.stars[TakeMod(starsNum,pageNo);
+            
         }
     }
     else{
         if(1 > pageNo){
-            pageNo = pageNo + 1;
+            pageNo = pageNo - 1;
         }
     }
 }
