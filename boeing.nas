@@ -116,8 +116,20 @@ var LonDmmUnsignal = func(LonDeg){
 		return lonresults_INIT;
 	}
 var getIRSPos = func(cduInputedPos){
-	setprop("/instrumentation/fmc/inertialposlat", inputPosLatConversion(cduInputedPos));
-	setprop("/instrumentation/fmc/inertialposlon", inputPosLonConversion(cduInputedPos));
+ 
+ 	call(func inputPosLatConversion(cduInputedPos), nil, var err = []);
+	if(size(err)){
+		setprop("/instrumentation/cdu/input", "INVALID");
+	}else{
+		setprop("/instrumentation/fmc/inertialposlat", inputPosLatConversion(cduInputedPos));
+	}
+	
+	call(func inputPosLonConversion(cduInputedPos), nil, var err1 = []);
+	if(size(err1)){
+		setprop("/instrumentation/cdu/input", "INVALID");
+	}else{
+		setprop("/instrumentation/fmc/inertialposlon", inputPosLonConversion(cduInputedPos));
+	}
 	setprop("/instrumentation/fmc/inertialpos", latdeg2latDMM(getprop("/instrumentation/fmc/inertialposlat"))~" "~londeg2lonDMM(getprop("/instrumentation/fmc/inertialposlon")));
 	}
 var getGpsPos = func(){
@@ -859,7 +871,7 @@ var cdu = func{
 			else{
 				title = "DEPARTURES";
 			}
-			line1ct = "RTE 1";
+			line1c = "RTE 1";
 			line1lt = "SIDS";
 			line1l = echoSids(getprop("/instrumentation/cdu/sids/page"))[0];
 			line2l = echoSids(getprop("/instrumentation/cdu/sids/page"))[1];
