@@ -1,26 +1,30 @@
 var echoSids = func(page){
 	var apt = airportinfo(getprop("/autopilot/route-manager/departure/airport"));
-	var allSids = apt.sids();
-	var echoedSids = [];
-	var i = 0;
-	var sidsNum = size(apt.sids());
+	if(getprop("/autopilot/route-manager/departure/airport") != ""){
+		var allSids = apt.sids();
+		var echoedSids = [];
+		var i = 0;
+		var sidsNum = size(apt.sids());
 	
-	var countStart = (page - 1) * 5;
-	if(countStart > sidsNum){
-		die("No more SIDS");
-	}
-	count = countStart;
-	while(i <= 5){
-	    if(count <= sidsNum){
-			append(echoedSids, allSids[count]);
-			i = i + 1;
+		var countStart = (page - 1) * 5;
+		if(countStart > sidsNum){
+			setprop("/instrumentation/cdu/sids/page", page - 1);
+			}
+			count = countStart;
+			while(i <= 5){
+			if(count < sidsNum){
+				append(echoedSids, allSids[count]);
+				i = i + 1;
 			count = count + 1;
-		}else{
-			append(echoedSids, "");
-			i = i + 1;
-		}
+			}else{
+				append(echoedSids, "");
+				i = i + 1;
+				}
+				}
+				return echoedSids;
+	}else{
+		return ["", "", "", "", ""];
 	}
-	return echoedSids;
 }
 var inputPosLatConversion = func(inputedPos){
 	var isNorth = 1;
@@ -183,6 +187,18 @@ var input = func(v) {
 var input = func(v) {
 		setprop("/instrumentation/cdu/input",getprop("/instrumentation/cdu/input")~v);
 	}
+var sidNextPge = func(){
+	var tmp = getprop("/instrumentation/cdu/sids/page");
+	tmp = tmp + 1;
+	setprop("/instrumentation/cdu/sids/page", tmp);
+}
+var sidPrevPge = func(){
+	var tmp = getprop("/instrumentation/cdu/sids/page");
+	if(tmp - 1 >= 1){
+		tmp = tmp - 1;
+	}
+	setprop("/instrumentation/cdu/sids/page", tmp);
+}
 	
 var key = func(v) {
 		var cduDisplay = getprop("/instrumentation/cdu/display");
@@ -194,6 +210,7 @@ var key = func(v) {
 			if (v == "LSK1L"){
 				if (cduDisplay == "DEP_ARR_INDEX"){
 					cduDisplay = "RTE1_DEP";
+					setprop("/instrumentation/cdu/sids/page", 1);
 				}
 				if (cduDisplay == "EICAS_MODES"){
 					eicasDisplay = "ENG";
@@ -842,13 +859,13 @@ var cdu = func{
 			else{
 				title = "DEPARTURES";
 			}
-			line2ct = "RTE 1";
+			line1ct = "RTE 1";
 			line1lt = "SIDS";
-			line1l = echoSids(1)[0];
-			line2l = echoSids(1)[1];
-			line3l = echoSids(1)[2];
-			line4l = echoSids(1)[3];
-			line5l = echoSids(1)[4];
+			line1l = echoSids(getprop("/instrumentation/cdu/sids/page"))[0];
+			line2l = echoSids(getprop("/instrumentation/cdu/sids/page"))[1];
+			line3l = echoSids(getprop("/instrumentation/cdu/sids/page"))[2];
+			line4l = echoSids(getprop("/instrumentation/cdu/sids/page"))[3];
+			line5l = echoSids(getprop("/instrumentation/cdu/sids/page"))[4];
 			line6ct = "----------------------------------------";
 			line1rt = "RUNWAYS";
 			if (getprop("/autopilot/route-manager/departure/runway") != nil){

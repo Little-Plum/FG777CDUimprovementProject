@@ -1230,6 +1230,20 @@
 			<value>POS_INIT</value>
         </binding>		
 	</action>
+    <action>
+        <button>0</button>
+        <repeatable>false</repeatable>
+        <binding>
+            <condition>
+                <equals>
+                    <property>/instrumentation/cdu/display</property>
+                    <value>RTE1_DEP</value>
+                </equals>
+            </condition>
+            <command>nasal</command>
+            <script>cdu.sidNextPge();</script>
+        </binding>
+    </action>
 </animation>
 
 <animation>
@@ -1276,6 +1290,20 @@
 			<value>POS_REF</value>
         </binding>
 	</action>
+    <action>
+        <button>0</button>
+        <repeatable>false</repeatable>
+        <binding>
+            <condition>
+                <equals>
+                    <property>/instrumentation/cdu/display</property>
+                    <value>RTE1_DEP</value>
+                </equals>
+            </condition>
+            <command>nasal</command>
+            <script>cdu.sidPrevPge();</script>
+        </binding>
+    </action>
 </animation>
 
 <animation>
